@@ -83,6 +83,83 @@ export class DashboardComponent implements OnInit {
       .subscribe((tasks) => {
         // console.log(tasks);
         this.allTasks = tasks;
+        // console.log(tasks);
+      });
+  }
+
+  DeleteTask(id: string | undefined) {
+    this.http
+      .delete(
+        `https://angularhttpclient-fc045-default-rtdb.firebaseio.com/tasks/${id}.json`
+      )
+      // .subscribe((res) => {
+      //   console.log(res);
+      // });
+      .subscribe((res) => {
+        this.fetchAllTasks();
+      });
+  }
+
+  DeleteAllTask() {
+    this.http
+      .delete(
+        `https://angularhttpclient-fc045-default-rtdb.firebaseio.com/tasks.json`
+      )
+      .subscribe((res) => {
+        this.fetchAllTasks();
       });
   }
 }
+
+// Конечно, предположим, у вас есть объект response, который содержит данные о задачах в виде ключей и объектов задач:
+
+// typescript
+// Copy code
+// let response = {
+//   "-NsDNTHvD-o4Gh7xFgA7": {
+//     title: "Task 1",
+//     assignedTo: "John",
+//     priority: "High",
+//     status: "Open"
+//   },
+//   "-NsDNTHvD-o4Gh7xFgA8": {
+//     title: "Task 2",
+//     assignedTo: "Jane",
+//     priority: "Medium",
+//     status: "In Progress"
+//   }
+// };
+// Когда вы применяете ваш цикл for...in к объекту response и используете его для создания массива tasks, результат будет выглядеть следующим образом:
+
+// typescript
+// Copy code
+// let tasks = [];
+
+// for (let key in response) {
+//   if (response.hasOwnProperty(key)) {
+//     tasks.push({ ...response[key], id: key });
+//   }
+// }
+
+// console.log(tasks);
+// После выполнения этого кода массив tasks будет выглядеть так:
+
+// typescript
+// Copy code
+// [
+//   {
+//     title: "Task 1",
+//     assignedTo: "John",
+//     priority: "High",
+//     status: "Open",
+//     id: "-NsDNTHvD-o4Gh7xFgA7"
+//   },
+//   {
+//     title: "Task 2",
+//     assignedTo: "Jane",
+//     priority: "Medium",
+//     status: "In Progress",
+//     id: "-NsDNTHvD-o4Gh7xFgA8"
+//   }
+// ]
+// В этом массиве каждая задача расширена свойством id, которое соответствует ключу объекта response, и все остальные свойства задачи остаются такими же, как в исходных объектах задач в response.
