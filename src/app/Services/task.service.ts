@@ -5,14 +5,16 @@ import {
 } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Task } from '../Model/Task';
-import { map } from 'rxjs/operators';
-import { Subject } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import { Subject, throwError } from 'rxjs';
+import { LoggingService } from './Logging.Service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TaskService {
   http: HttpClient = inject(HttpClient);
+  loggingServise: LoggingService = inject(LoggingService);
   errorSubject = new Subject<HttpErrorResponse>();
 
   constructor() {}
@@ -24,6 +26,19 @@ export class TaskService {
         'https://angularhttpclient-fc045-default-rtdb.firebaseio.com/tasks.json',
         task,
         { headers: headers }
+      )
+      .pipe(
+        catchError((err) => {
+          // Write the logic to log errors
+
+          const errorObj = {
+            statusCode: err.status,
+            errorMessage: err.message,
+            datetime: new Date(),
+          };
+          this.loggingServise.logError(errorObj);
+          return throwError(() => err);
+        })
       )
       .subscribe({
         error: (err) => {
@@ -37,6 +52,19 @@ export class TaskService {
       .delete(
         `https://angularhttpclient-fc045-default-rtdb.firebaseio.com/tasks/${id}.json`
       )
+      .pipe(
+        catchError((err) => {
+          // Write the logic to log errors
+
+          const errorObj = {
+            statusCode: err.status,
+            errorMessage: err.message,
+            datetime: new Date(),
+          };
+          this.loggingServise.logError(errorObj);
+          return throwError(() => err);
+        })
+      )
       .subscribe({
         error: (err) => {
           this.errorSubject.next(err);
@@ -48,6 +76,19 @@ export class TaskService {
     this.http
       .delete(
         `https://angularhttpclient-fc045-default-rtdb.firebaseio.com/tasks.json`
+      )
+      .pipe(
+        catchError((err) => {
+          // Write the logic to log errors
+
+          const errorObj = {
+            statusCode: err.status,
+            errorMessage: err.message,
+            datetime: new Date(),
+          };
+          this.loggingServise.logError(errorObj);
+          return throwError(() => err);
+        })
       )
       .subscribe({
         error: (err) => {
@@ -74,6 +115,17 @@ export class TaskService {
           }
 
           return tasks;
+        }),
+        catchError((err) => {
+          // Write the logic to log errors
+
+          const errorObj = {
+            statusCode: err.status,
+            errorMessage: err.message,
+            datetime: new Date(),
+          };
+          this.loggingServise.logError(errorObj);
+          return throwError(() => err);
         })
       );
   }
@@ -83,6 +135,19 @@ export class TaskService {
       .put(
         `https://angularhttpclient-fc045-default-rtdb.firebaseio.com/tasks/${id}.json`,
         data
+      )
+      .pipe(
+        catchError((err) => {
+          // Write the logic to log errors
+
+          const errorObj = {
+            statusCode: err.status,
+            errorMessage: err.message,
+            datetime: new Date(),
+          };
+          this.loggingServise.logError(errorObj);
+          return throwError(() => err);
+        })
       )
       .subscribe({
         error: (err) => {
