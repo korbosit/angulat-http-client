@@ -1,12 +1,13 @@
 import {
   HttpClient,
   HttpErrorResponse,
+  HttpEventType,
   HttpHeaders,
   HttpParams,
 } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Task } from '../Model/Task';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, map, tap } from 'rxjs/operators';
 import { Subject, throwError } from 'rxjs';
 import { LoggingService } from './Logging.Service';
 
@@ -76,9 +77,15 @@ export class TaskService {
   DeleteAllTasks() {
     this.http
       .delete(
-        `https://angularhttpclient-fc045-default-rtdb.firebaseio.com/tasks.json`
+        `https://angularhttpclient-fc045-default-rtdb.firebaseio.com/tasks.json`,
+        { observe: 'events', responseType: 'json' }
       )
       .pipe(
+        tap((event) => {
+          console.log(event);
+          if (event.type === HttpEventType.Sent) {
+          }
+        }),
         catchError((err) => {
           // Write the logic to log errors
 
@@ -100,21 +107,9 @@ export class TaskService {
 
   GetAllTasks() {
     let headers = new HttpHeaders();
-    //
-    // headers = headers.set('content-type', 'application/json');
-    // headers = headers.set('Access-Contol-Allow-Origin', '*');
-
-    // Replaces with last
-    // headers = headers.set('content-type', 'application/json');
-    // headers = headers.set('content-type', 'text/html');
-
     // Adds
     headers = headers.append('content-type', 'application/json');
     headers = headers.append('content-type', 'text/html');
-
-    // headers = headers.append('content-type', 'application/json');
-    // headers = headers.append('Access-Contol-Allow-Origin', '*');
-    // This code will return us an array and in this array you will have task objects
 
     let queryParams = new HttpParams();
     queryParams = queryParams.set('page', 2);
@@ -122,14 +117,14 @@ export class TaskService {
 
     return this.http
       .get<{ [key: string]: Task }>(
-        // 'https://angularhttpclient-fc045-default-rtdb.firebaseio.com/tasks.json?page=2&item=10',
         'https://angularhttpclient-fc045-default-rtdb.firebaseio.com/tasks.json',
-        { headers: headers, params: queryParams }
+        { headers: headers, params: queryParams, observe: 'body' }
       )
       .pipe(
         map((response) => {
           // We'll get an object, so we'll convert it to an array of objects
           let tasks = [];
+          console.log(response);
           for (let key in response) {
             if (response.hasOwnProperty(key)) {
               // Push a new object in the array
@@ -197,8 +192,6 @@ export class TaskService {
     // });
   }
 }
-
-// Конечно, предположим, у вас есть объект response, который содержит данные о задачах в виде ключей и объектов задач:
 
 // typescript
 // Copy code
