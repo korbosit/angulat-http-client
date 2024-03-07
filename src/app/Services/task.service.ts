@@ -1,13 +1,19 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpErrorResponse,
+  HttpHeaders,
+} from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Task } from '../Model/Task';
 import { map } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TaskService {
   http: HttpClient = inject(HttpClient);
+  errorSubject = new Subject<HttpErrorResponse>();
 
   constructor() {}
 
@@ -19,10 +25,10 @@ export class TaskService {
         task,
         { headers: headers }
       )
-      .subscribe((response) => {
-        console.log(response);
-        // // so that when you click the create task button a new task appeared on the dashboard
-        // this.fetchAllTasks();
+      .subscribe({
+        error: (err) => {
+          this.errorSubject.next(err);
+        },
       });
   }
 
@@ -31,7 +37,11 @@ export class TaskService {
       .delete(
         `https://angularhttpclient-fc045-default-rtdb.firebaseio.com/tasks/${id}.json`
       )
-      .subscribe((res) => {});
+      .subscribe({
+        error: (err) => {
+          this.errorSubject.next(err);
+        },
+      });
   }
 
   DeleteAllTasks() {
@@ -39,7 +49,11 @@ export class TaskService {
       .delete(
         `https://angularhttpclient-fc045-default-rtdb.firebaseio.com/tasks.json`
       )
-      .subscribe();
+      .subscribe({
+        error: (err) => {
+          this.errorSubject.next(err);
+        },
+      });
   }
 
   GetAllTasks() {
@@ -70,7 +84,11 @@ export class TaskService {
         `https://angularhttpclient-fc045-default-rtdb.firebaseio.com/tasks/${id}.json`,
         data
       )
-      .subscribe((data) => {});
+      .subscribe({
+        error: (err) => {
+          this.errorSubject.next(err);
+        },
+      });
   }
 }
 

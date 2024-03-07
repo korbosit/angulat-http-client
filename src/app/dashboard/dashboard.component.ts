@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CreateTaskComponent } from './create-task/create-task.component';
 import { Task } from '../Model/Task';
@@ -9,6 +9,7 @@ import {
   HttpHeaders,
 } from '@angular/common/http';
 import { TaskService } from '../Services/task.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
@@ -17,7 +18,7 @@ import { TaskService } from '../Services/task.service';
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
   showCreateTaskForm: boolean = false;
   http: HttpClient = inject(HttpClient);
   allTasks: Task[] = [];
@@ -29,8 +30,19 @@ export class DashboardComponent implements OnInit {
 
   errorMessage: string | null = null;
 
+  errorSub: Subscription;
+
   ngOnInit() {
     this.fetchAllTasks();
+    this.errorSub = this.taskService.errorSubject.subscribe({
+      next: (httpError) => {
+        this.setErrorMessage(httpError);
+      },
+    });
+  }
+
+  ngOnDestroy() {
+    this.errorSub.unsubscribe();
   }
 
   OpenCreateTaskForm() {
@@ -77,9 +89,6 @@ export class DashboardComponent implements OnInit {
         // this.errorMessage = error.message;
         this.setErrorMessage(error);
         this.isLoading = false;
-        setTimeout(() => {
-          this.errorMessage = null;
-        }, 3000);
       },
     });
   }
@@ -88,7 +97,13 @@ export class DashboardComponent implements OnInit {
     // console.log(err);
     if (err.error.error === 'Permission denied') {
       this.errorMessage = 'You do not have permissionto perfom this action';
+    } else {
+      this.errorMessage = err.message;
     }
+
+    setTimeout(() => {
+      this.errorMessage = null;
+    }, 3000);
   }
 
   DeleteTask(id: string | undefined) {
