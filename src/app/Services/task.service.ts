@@ -2,6 +2,7 @@ import {
   HttpClient,
   HttpErrorResponse,
   HttpHeaders,
+  HttpParams,
 } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Task } from '../Model/Task';
@@ -114,10 +115,16 @@ export class TaskService {
     // headers = headers.append('content-type', 'application/json');
     // headers = headers.append('Access-Contol-Allow-Origin', '*');
     // This code will return us an array and in this array you will have task objects
+
+    let queryParams = new HttpParams();
+    queryParams = queryParams.set('page', 2);
+    queryParams = queryParams.set('item', 10);
+
     return this.http
       .get<{ [key: string]: Task }>(
+        // 'https://angularhttpclient-fc045-default-rtdb.firebaseio.com/tasks.json?page=2&item=10',
         'https://angularhttpclient-fc045-default-rtdb.firebaseio.com/tasks.json',
-        { headers: headers }
+        { headers: headers, params: queryParams }
       )
       .pipe(
         map((response) => {
