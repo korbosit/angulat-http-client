@@ -21,6 +21,8 @@ export class DashboardComponent implements OnInit {
   http: HttpClient = inject(HttpClient);
   allTasks: Task[] = [];
   taskService: TaskService = inject(TaskService);
+  currentTaskId: string = '';
+
   editMode: boolean = false;
   selectedTask: Task;
 
@@ -45,8 +47,10 @@ export class DashboardComponent implements OnInit {
     this.showCreateTaskForm = false;
   }
 
-  CreateTask(data: Task) {
-    this.taskService.CreateTask(data);
+  CreateOrUpdateTask(data: Task) {
+    if (!this.editMode) this.taskService.CreateTask(data);
+    // edit task
+    else this.taskService.UpdateTask(this.currentTaskId, data);
   }
 
   FetchAllTaskClicked() {
@@ -74,6 +78,7 @@ export class DashboardComponent implements OnInit {
   }
 
   OnEditTaskClicked(id: string | undefined) {
+    this.currentTaskId = id;
     // OPEN EDIT TASK FORM
     this.showCreateTaskForm = true;
     this.editMode = true;
