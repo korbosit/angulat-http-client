@@ -98,10 +98,26 @@ export class TaskService {
   }
 
   GetAllTasks() {
+    let headers = new HttpHeaders();
+    //
+    // headers = headers.set('content-type', 'application/json');
+    // headers = headers.set('Access-Contol-Allow-Origin', '*');
+
+    // Replaces with last
+    // headers = headers.set('content-type', 'application/json');
+    // headers = headers.set('content-type', 'text/html');
+
+    // Adds
+    headers = headers.append('content-type', 'application/json');
+    headers = headers.append('content-type', 'text/html');
+
+    // headers = headers.append('content-type', 'application/json');
+    // headers = headers.append('Access-Contol-Allow-Origin', '*');
     // This code will return us an array and in this array you will have task objects
     return this.http
       .get<{ [key: string]: Task }>(
-        'https://angularhttpclient-fc045-default-rtdb.firebaseio.com/tasks.json'
+        'https://angularhttpclient-fc045-default-rtdb.firebaseio.com/tasks.json',
+        { headers: headers }
       )
       .pipe(
         map((response) => {
