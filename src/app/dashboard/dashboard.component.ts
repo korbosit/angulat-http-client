@@ -10,15 +10,22 @@ import {
 } from '@angular/common/http';
 import { TaskService } from '../Services/task.service';
 import { Subscription } from 'rxjs';
+import { TaskDetailsComponent } from './task-details/task-details.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, CreateTaskComponent, HttpClientModule],
+  imports: [
+    CommonModule,
+    CreateTaskComponent,
+    HttpClientModule,
+    TaskDetailsComponent,
+  ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })
 export class DashboardComponent implements OnInit, OnDestroy {
+  showTaskDetails: boolean = false;
   showCreateTaskForm: boolean = false;
   http: HttpClient = inject(HttpClient);
   allTasks: Task[] = [];
@@ -31,6 +38,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   errorMessage: string | null = null;
 
   errorSub: Subscription;
+
+  currentTask: Task | null = null;
 
   ngOnInit() {
     this.fetchAllTasks();
@@ -56,6 +65,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
       priority: '',
       status: '',
     };
+  }
+
+  showCurrentTaskDetails(id: string | undefined) {
+    this.showTaskDetails = true;
+    this.taskService.getTaskDetails(id).subscribe({
+      next: (data: Task) => {
+        this.currentTask = data;
+      },
+    });
+  }
+
+  CloseTaskDetails() {
+    this.showTaskDetails = false;
   }
 
   CloseCreateTaskForm() {

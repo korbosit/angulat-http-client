@@ -155,6 +155,24 @@ export class TaskService {
         },
       });
   }
+
+  getTaskDetails(id: string | undefined) {
+    return this.http
+      .get(
+        `https://angularhttpclient-fc045-default-rtdb.firebaseio.com/tasks/${id}.json`
+      )
+      .pipe(
+        map((response) => {
+          console.log(response);
+          let task = {};
+          task = { ...response, id: id };
+          return task;
+        })
+      );
+    // .subscribe((task) => {
+    //   console.log(task);
+    // });
+  }
 }
 
 // Конечно, предположим, у вас есть объект response, который содержит данные о задачах в виде ключей и объектов задач:
