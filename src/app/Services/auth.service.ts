@@ -17,26 +17,51 @@ export class AuthService {
         'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyDxiWsvz9jVbe4fhiq9dKxNXaaTd4Qfy98',
         data
       )
-      .pipe(
-        catchError((err) => {
-          let errorMessage = 'An unknown error has occured';
-          if (!err.error || !err.error.error) {
-            return throwError(() => errorMessage);
-          }
-          switch (err.error.error.message) {
-            case 'EMAIL_EXISTS':
-              errorMessage = 'This email already exist';
-              break;
-            case 'OPERATION_NOT_ALLOWED':
-              errorMessage = 'This operation is not allowed';
-              break;
-            case 'TOO_MANY_ATTEMPTS_TRY_LATER':
-              errorMessage =
-                ' We have blocked all requests from this device due to unusual activity. Try again later';
-              break;
-          }
-          return throwError(() => errorMessage);
-        })
-      );
+      .pipe(catchError(this.handleError));
+  }
+
+  login(email, password) {
+    // see firebase docs https://firebase.google.com/docs/reference/rest/auth#section-sign-in-email-password
+    const data = { email: email, password: password, returnSecureToken: true };
+    return this.http
+      .post<AuthResponse>(
+        'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyDxiWsvz9jVbe4fhiq9dKxNXaaTd4Qfy98',
+        data
+      )
+      .pipe(catchError(this.handleError));
+  }
+
+  private handleError(err) {
+    let errorMessage = 'An unknown error has occured';
+    console.log(err);
+    if (!err.error || !err.error.error) {
+      return throwError(() => errorMessage);
+    }
+    switch (err.error.error.message) {
+      case 'EMAIL_EXISTS':
+        errorMessage = 'This email already exist';
+        break;
+      case 'OPERATION_NOT_ALLOWED':
+        errorMessage = 'This operation is not allowed';
+        break;
+      case 'TOO_MANY_ATTEMPTS_TRY_LATER':
+        errorMessage =
+          ' We have blocked all requests from this device due to unusual activity. Try again later';
+        break;
+      // case 'EMAIL_NOT_FOUND':
+      //   errorMessage = ' This email does not exist';
+      //   break;
+      case 'INVALID_LOGIN_CREDENTIALS':
+        errorMessage = ' The email ID or Password is not correct';
+        break;
+      // case 'INVALID_PASSWORD':
+      //   errorMessage = ' Provided password is incorrect';
+      //   break;
+      case 'USER_DISABLED':
+        errorMessage =
+          ' The user account has been disabled by an administrator.';
+        break;
+    }
+    return throwError(() => errorMessage);
   }
 }
