@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { SnackbarComponent } from '../utility/snackbar/snackbar.component';
 import { Observable } from 'rxjs';
 import { AuthResponse } from '../Model/AuthResponse';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -19,6 +20,7 @@ export class LoginComponent {
   isLoading: boolean = false;
   errorMessage: string | null = null;
   authObs: Observable<AuthResponse>;
+  router: Router = inject(Router);
 
   authService: AuthService = inject(AuthService);
 
@@ -44,6 +46,7 @@ export class LoginComponent {
       next: (res) => {
         console.log(res);
         this.isLoading = false;
+        this.router.navigate(['/dashboard']);
       },
       error: (errMsg) => {
         this.isLoading = false;
