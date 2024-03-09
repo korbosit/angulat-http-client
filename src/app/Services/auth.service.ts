@@ -1,14 +1,16 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { AuthResponse } from '../Model/AuthResponse';
-import { catchError, throwError } from 'rxjs';
+import { Subject, catchError, tap, throwError } from 'rxjs';
+import { User } from '../Model/User';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   http: HttpClient = inject(HttpClient);
-  error: string | null = null;
+  // error: string | null = null;
+  user = new Subject<User>();
   signup(email, password) {
     // see firebase docs https://firebase.google.com/docs/reference/rest/auth#section-sign-in-email-password
     const data = { email: email, password: password, returnSecureToken: true };
@@ -17,7 +19,12 @@ export class AuthService {
         'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyDxiWsvz9jVbe4fhiq9dKxNXaaTd4Qfy98',
         data
       )
-      .pipe(catchError(this.handleError));
+      .pipe(
+        catchError(this.handleError),
+        tap((res) => {
+          this.handleCreateUser(res);
+        })
+      );
   }
 
   login(email, password) {
@@ -28,9 +35,20 @@ export class AuthService {
         'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyDxiWsvz9jVbe4fhiq9dKxNXaaTd4Qfy98',
         data
       )
-      .pipe(catchError(this.handleError));
+      .pipe(
+        catchError(this.handleError),
+        tap((res) => {
+          this.handleCreateUser(res);
+        })
+      );
   }
 
+  private handleCreateUser(res) {
+    const expiresInTs = new Date().getTime() + +res.expiresIn * 1000;
+    const expiresIn = new Date(expiresInTs);
+    const user = new User(res.email, res.localId, res.idToken, expiresIn);
+    this.user.next(user);
+  }
   private handleError(err) {
     let errorMessage = 'An unknown error has occured';
     console.log(err);
