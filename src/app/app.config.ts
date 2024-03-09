@@ -9,6 +9,7 @@ import {
   withInterceptorsFromDi,
 } from '@angular/common/http';
 import { AuthInterceptorService } from './Services/auth-interceptor.sevice';
+import { LoggingInterceptorService } from './Services/logging-interceptor.service';
 
 // export const appConfig: ApplicationConfig = {
 //   providers: [
@@ -29,6 +30,11 @@ export const appConfig: ApplicationConfig = {
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptorService,
+      multi: true,
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: LoggingInterceptorService,
       multi: true,
     },
   ],
