@@ -11,6 +11,8 @@ import {
 import { TaskService } from '../Services/task.service';
 import { Subscription } from 'rxjs';
 import { TaskDetailsComponent } from './task-details/task-details.component';
+import { LoaderComponent } from '../utility/loader/loader.component';
+import { SnackbarComponent } from '../utility/snackbar/snackbar.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -20,6 +22,8 @@ import { TaskDetailsComponent } from './task-details/task-details.component';
     CreateTaskComponent,
     HttpClientModule,
     TaskDetailsComponent,
+    LoaderComponent,
+    SnackbarComponent,
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
